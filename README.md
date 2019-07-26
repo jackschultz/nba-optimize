@@ -6,12 +6,11 @@ Three files included, `basic_optimize.py`, `brisk_optimize.py`, and `fast_optimi
 
 I included a couple csv data files for us to use. I used other code to get the data from nba.com and the info from FanDuel csv files that list the players and their salaries.
 
-To run, pip install the requirements for python3, and then run:
-
-I'm assuming you'll have a virtualenv running python 3. If so, run the following:
+I'm assuming you'll have a virtualenv running python3. If so, run the following:
 
 ```
 (nbaoptimize) $ pip install -r requirements
+  .....
 (nbaoptimize) $ python fast_optimize.py 2018-10-24
 ```
 
