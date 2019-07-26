@@ -11,8 +11,8 @@ To run, pip install the requirements for python3, and then run:
 I'm assuming you'll have a virtualenv running python 3. If so, run the following:
 
 ```
-$ pip install -r requirements
-$ python fast_optimize.py 2018-10-24
+(nbaoptimize) $ pip install -r requirements
+(nbaoptimize) $ python fast_optimize.py 2018-10-24
 ```
 
 where the second argument is the data file to use.
