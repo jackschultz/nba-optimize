@@ -43,27 +43,27 @@ def combine_single_position(position, num_players, df):
     costs = posdf['sal'].values
 
     cost_ranges = range(3500*num_players, 12000*num_players, 100)
-
     return [calculate_position_combination(test_salary, num_players, costs, points, posdf_indicies) for test_salary in cost_ranges]
 
 def calculate_max_points(pos1, pos2, test_salary):
 
-    costs = np.array([cost for _,_,cost,_ in pos1])
-    costs2 = np.array([cost for _,_,cost,_ in pos2])
+    costs = np.array([cost for _,_,_,cost in pos1])
+    costs2 = np.array([cost for _,_,_,cost in pos2])
 
-    points = np.array([point for _,_,_,point in pos1])
-    points2 = np.array([point for _,_,_,point in pos2])
+    points = np.array([point for _,_,point,_ in pos1])
+    points2 = np.array([point for _,_,point,_ in pos2])
 
     ids = np.array([ind for _,ind,_,_ in pos1])
     ids2 = np.array([ind for _,ind,_,_ in pos2])
 
+    #combining the two arrays to create a full testable combinations
     full_costs = costs[:, np.newaxis] + costs2
     full_points = points[:, np.newaxis] + points2
 
     valids = full_costs <= test_salary
     possibilites = full_points * valids
-
     x, y = np.unravel_index(possibilites.argmax(), possibilites.shape)
+
     max_points = full_points[x,y]
     max_costs = full_costs[x,y]
     max_inds = np.concatenate([ids[x], ids2[y]])
@@ -72,7 +72,7 @@ def calculate_max_points(pos1, pos2, test_salary):
 
 def combine_multiple_positions(pos1, pos2, num_players):
 
-    cost_ranges = np.array(list(range(3500*num_players, 60000+100, 100)))
+    cost_ranges = range(3500*num_players, 60000+100, 100)
     return [calculate_max_points(pos1, pos2, test_salary) for test_salary in cost_ranges]
 
 def combine_all_positions(tops_array):
@@ -94,7 +94,6 @@ def combine_all_positions(tops_array):
 
         return combine_multiple_positions(half1top, half2top, players_in_combo)
 
-
 def optimize(combo_positions_dict, df):
 
     tops={} #tops meaning, well, they're on top.
@@ -107,8 +106,9 @@ def optimize(combo_positions_dict, df):
     winner = asdf[-1]
     winning_ids = winner[1]
 
-    print(df.ix[winning_ids])
-
+    print(df.iloc[winning_ids])
+    print(sum(df.iloc[winning_ids].pts))
+    print(sum(df.iloc[winning_ids].sal))
 
 if __name__ == '__main__':
 
