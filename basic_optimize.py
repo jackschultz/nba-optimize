@@ -110,7 +110,6 @@ def optimize(pgs, sgs, sfs, pfs, cs):
     print("Combining all positions")
     fin = combine_multiple_positions(pgsg, sfpfc)
 
-    print(fin)
     return fin
 
 if __name__ == '__main__':
@@ -118,6 +117,7 @@ if __name__ == '__main__':
     opt_date = sys.argv[1] #always assuming there's a date passed from the command line
     data_filename = f"{opt_date}.csv"
 
+    dbid = {} #used for showing the winners at the end
     pgs = []
     sgs = []
     sfs = []
@@ -127,6 +127,7 @@ if __name__ == '__main__':
         csv_reader = csv.DictReader(csv_file)
         rows = list(csv_reader)
         for row in reversed(rows):
+            dbid[int(row['pid'])] = row
             row['pid'] = int(row['pid'])
             row['sal'] = int(row['sal'])
             row['pts'] = float(row['pts'])
@@ -141,21 +142,12 @@ if __name__ == '__main__':
             elif row['pos'] == 'C':
                 cs.append(row)
 
-
-
     fin = optimize(pgs, sgs, sfs, pfs, cs)
 
     print(fin[-1])
     pids = fin[-1][3]
 
-    dbid = {}
-    with open(data_filename) as csv_file:
-        reader = csv.reader(csv_file)
-        next(reader)
-        for row in reader:
-            dbid[int(row[0])] = row
-
     for pid in pids:
         pinfo = dbid[pid]
-        print(pinfo)
+        print(pinfo['name'], pinfo['pos'], pinfo['sal'], pinfo['pts'])
 
