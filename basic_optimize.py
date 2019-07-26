@@ -1,8 +1,9 @@
 import csv
 import sys
 import itertools
-import cProfile, pstats, io
 import numpy as np
+
+from utils import time_and_slow_calls
 
 import pdb
 pry = pdb.set_trace
@@ -84,7 +85,39 @@ def combine_multiple_positions(pos1, pos2):
 
     return [calculate_max_points(pos1, pos2, salary) for salary in cost_ranges]
 
-def optimize(data_filename):
+@time_and_slow_calls
+def optimize(pgs, sgs, sfs, pfs, cs):
+    print("Calculating initial PGs")
+    pgt = combine_single_position(pgs, 2)
+    print("Calculating initial SGs")
+    sgt = combine_single_position(sgs, 2)
+    print("Calculating initial SFs")
+    sft = combine_single_position(sfs, 2)
+    print("Calculating initial PFs")
+    pft = combine_single_position(pfs, 2)
+    print("Calculating initial Cs")
+    ct = combine_single_position(cs, 1)
+
+    print("Combining PGs and SGs")
+    pgsg = combine_multiple_positions(pgt, sgt)
+
+    print("Combining PFs and SFs")
+    sfpf = combine_multiple_positions(sft, pft)
+
+    print("Combining PFs, SFs, and Cs")
+    sfpfc = combine_multiple_positions(sfpf, ct)
+
+    print("Combining all positions")
+    fin = combine_multiple_positions(pgsg, sfpfc)
+
+    print(fin)
+    return fin
+
+if __name__ == '__main__':
+
+    opt_date = sys.argv[1] #always assuming there's a date passed from the command line
+    data_filename = f"{opt_date}.csv"
+
     pgs = []
     sgs = []
     sfs = []
@@ -108,52 +141,9 @@ def optimize(data_filename):
             elif row['pos'] == 'C':
                 cs.append(row)
 
-    num_players = 2
-    print("Calculating initial PGs")
-    pgt = combine_single_position(pgs, 2)
-    print("Calculating initial SGs")
-    sgt = combine_single_position(sgs, 2)
-    print("Calculating initial SFs")
-    sft = combine_single_position(sfs, 2)
-    print("Calculating initial PFs")
-    pft = combine_single_position(pfs, 2)
-    print("Calculating initial Cs")
-    ct = combine_single_position(cs, 1)
 
-    print("Combining PGs and SGs")
-    pgsg = combine_multiple_positions(pgt, sgt)
-    print(pgsg[-1])
 
-    print("Combining PFs and SFs")
-    sfpf = combine_multiple_positions(sft, pft)
-    print(sfpf[-1])
-
-    print("Combining PFs, SFs, and Cs")
-    sfpfc = combine_multiple_positions(sfpf, ct)
-    print(sfpfc[-1])
-
-    print("Combining all positions")
-    fin = combine_multiple_positions(pgsg, sfpfc)
-    print(fin[-1])
-    return fin
-
-if __name__ == '__main__':
-
-    opt_date = sys.argv[1] #always assuming there's a date passed from the command line
-    data_filename = f"{opt_date}.csv"
-
-    pr = cProfile.Profile()
-    pr.enable()
-    s = io.StringIO()
-
-    fin = optimize(data_filename)
-
-    pr.disable()
-    s = io.StringIO()
-    sortby = 'tottime'
-    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-    ps.print_stats(5)
-    print(s.getvalue())
+    fin = optimize(pgs, sgs, sfs, pfs, cs)
 
     print(fin[-1])
     pids = fin[-1][3]

@@ -1,6 +1,7 @@
 import sys
 import itertools
-import cProfile, pstats, io
+
+from utils import time_and_slow_calls
 
 import numpy as np
 import pandas as pd
@@ -94,6 +95,7 @@ def combine_all_positions(tops_array):
 
         return combine_multiple_positions(half1top, half2top, players_in_combo)
 
+@time_and_slow_calls
 def optimize(combo_positions_dict, df):
 
     tops={} #tops meaning, well, they're on top.
@@ -106,9 +108,7 @@ def optimize(combo_positions_dict, df):
     winner = asdf[-1]
     winning_ids = winner[1]
 
-    print(df.iloc[winning_ids])
-    print(sum(df.iloc[winning_ids].pts))
-    print(sum(df.iloc[winning_ids].sal))
+    return winning_ids
 
 if __name__ == '__main__':
 
@@ -119,17 +119,9 @@ if __name__ == '__main__':
     data_filename = f"{opt_date}.csv"
     df = pd.read_csv(data_filename)
 
-    pr = cProfile.Profile()
-    pr.enable()
-    s = io.StringIO()
+    winning_ids = optimize(combo_positions_dict, df)
 
-    fin = optimize(combo_positions_dict, df)
-
-    pr.disable()
-    s = io.StringIO()
-    sortby = 'tottime'
-    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-    ps.print_stats(10)
-    print(s.getvalue())
-
+    print(df.iloc[winning_ids])
+    print(sum(df.iloc[winning_ids].pts))
+    print(sum(df.iloc[winning_ids].sal))
 

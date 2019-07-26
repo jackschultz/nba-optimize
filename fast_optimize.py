@@ -1,11 +1,12 @@
 import sys
 import itertools
-import cProfile, pstats, io
 
 import numpy as np
 import pandas as pd
 import pdb
 pry = pdb.set_trace #yeah, I have a ruby background too
+
+from utils import time_and_slow_calls
 
 
 def calc_cost_ranges(num_players):
@@ -111,7 +112,7 @@ def restrict_and_merge(ids_comb, points_comb, cost_comb, cost_ranges):
     max_inds = ids_comb_full[row_selectors, top_inds]
     return cost_ranges, max_inds, max_points, max_costs
 
-
+@time_and_slow_calls
 def optimize(combo_positions_dict, df):
 
     tops={}
@@ -120,15 +121,8 @@ def optimize(combo_positions_dict, df):
         tops[position] = combine_single_position(position, num_players, df)
 
     tops_array = [vals for pos, vals in tops.items()]
-    fin = combine_all_positions(tops_array)
-    winner = fin[1]
-    winning_ids = winner[-1]
+    return combine_all_positions(tops_array)
 
-    print(df.iloc[winning_ids])
-    print("\n")
-    print("Combined player points:", sum(df.iloc[winning_ids].pts))
-    print("Combined player salary:", sum(df.iloc[winning_ids].sal))
-    print("\n")
 
 
 if __name__ == '__main__':
@@ -142,19 +136,12 @@ if __name__ == '__main__':
     data_filename = f"{opt_date}.csv"
     df = pd.read_csv(data_filename)
 
-    pr = cProfile.Profile()
-    pr.enable()
-    s = io.StringIO()
-
     fin = optimize(combo_positions_dict, df)
+    winner = fin[1]
+    winning_ids = winner[-1]
 
-    pr.disable()
-    s = io.StringIO()
-    sortby = 'tottime'
-    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-    ps.print_stats(10)
-    print(s.getvalue())
-
-
-
-
+    print(df.iloc[winning_ids])
+    print("\n")
+    print("Combined player points:", sum(df.iloc[winning_ids].pts))
+    print("Combined player salary:", sum(df.iloc[winning_ids].sal))
+    print("\n")
