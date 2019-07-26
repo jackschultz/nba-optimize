@@ -116,7 +116,7 @@ if __name__ == '__main__':
     combo_positions_dict = {'PG': 2, 'SG': 2, 'SF': 2, 'PF': 2, 'C': 1}
 
     opt_date = sys.argv[1] #always assuming there's a date passed from the command line
-    data_filename = f"{opt_date}.csv"
+    data_filename = f"data/{opt_date}.csv"
     df = pd.read_csv(data_filename)
 
     winning_ids = optimize(combo_positions_dict, df)

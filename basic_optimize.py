@@ -18,8 +18,8 @@ def calculate_position_combinations(player_combinations, test_salary, num_player
     those values. Returns an array of the best.
     '''
     #loop through the list of players that are of that posision
-    max_found_points = 0
-    best_combined_salary = 0
+    top_points = 0
+    top_cost = 0
     top_players = [-1] * num_players
     player_index_lists = [list(range(0, len(player_combinations)))] * num_players
     for indicies in index_generator(player_index_lists):
@@ -37,12 +37,12 @@ def calculate_position_combinations(player_combinations, test_salary, num_player
             continue
 
         points = sum([p['pts'] for p in test_players])
-        if points > max_found_points:
+        if points > top_points:
             top_players = [p['pid'] for p in test_players]
-            max_found_points = points
-            best_combined_salary = sum([p['sal'] for p in test_players])
+            top_points = points
+            top_cost = sum([p['sal'] for p in test_players])
 
-    return [test_salary, best_combined_salary, max_found_points, top_players]
+    return [test_salary, top_cost, top_points, top_players]
 
 def combine_single_position(players, num_players):
     '''
@@ -61,7 +61,7 @@ def calculate_max_points(pos1, pos2, test_salary):
     We store the information for each new max point combinations, as long as
     they're under the test_salary limit, and return those fields.
     '''
-    max_found_points = 0
+    top_points = 0
     for g1 in pos1: #g1 stands for group 1
         for g2 in pos2:
             #break if combined salary is above the test_salary
@@ -71,11 +71,11 @@ def calculate_max_points(pos1, pos2, test_salary):
                 break
             points = g1[2] + g2[2]
             #if the two point totals added together > current max point total
-            if points > max_found_points:
+            if points > top_points:
                 top_players = g1[3] + g2[3]
-                max_found_points = points
-                combined_sal = g1[1] + g2[1]
-    return [test_salary, combined_sal, max_found_points, top_players]
+                top_points = points
+                top_cost = g1[1] + g2[1]
+    return [test_salary, top_cost, top_points, top_players]
 
 def combine_multiple_positions(pos1, pos2):
 
@@ -115,7 +115,7 @@ def optimize(pgs, sgs, sfs, pfs, cs):
 if __name__ == '__main__':
 
     opt_date = sys.argv[1] #always assuming there's a date passed from the command line
-    data_filename = f"{opt_date}.csv"
+    data_filename = f"data/{opt_date}.csv"
 
     dbid = {} #used for showing the winners at the end
     pgs = []
