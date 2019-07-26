@@ -5,7 +5,7 @@ import cProfile, pstats, io
 import numpy as np
 import pandas as pd
 import pdb
-pry = pdb.set_trace
+pry = pdb.set_trace #yeah, I have a ruby background too
 
 
 def calc_cost_ranges(num_players):
@@ -79,27 +79,28 @@ def combine_all_positions(tops_array):
 
 def restrict_and_merge(ids_comb, points_comb, cost_comb, cost_ranges):
 
-    player_combination_size = len(ids_comb)
-    full_cost_ranges = np.tile(cost_ranges, (player_combination_size,1)).T
+    player_combination_size, num_ids_size = ids_comb.shape
     cost_ranges_size = cost_ranges.size #used to know how big to make the arrays
+
+    cost_ranges_full = np.broadcast_to(cost_ranges,(player_combination_size, cost_ranges_size)).T
 
     #creating an array where we add the costs together to get a 1d array
     cost_sum = cost_comb.sum(axis=1)
     points_sum = points_comb.sum(axis=1)
 
-    cost_sum_full = np.tile(cost_sum, (cost_ranges_size,1))
+    cost_sum_full = np.broadcast_to(cost_sum,(cost_ranges_size, player_combination_size))
     #adding the points of the combinations and making them zero if the salary sum is
     #higher than the max_salary
-    points_sum_full = np.tile(points_sum, (cost_ranges_size,1))
+    points_sum_full = np.broadcast_to(points_sum,(cost_ranges_size, player_combination_size))
 
     #used to snag the best players who've been selected
-    ids_comb_full = np.tile(ids_comb, (cost_ranges_size,1,1))
+    ids_comb_full = np.broadcast_to(ids_comb, (cost_ranges_size, player_combination_size, num_ids_size))
 
-    under_cost_limit = cost_sum_full <= full_cost_ranges
+    under_cost_limit = cost_sum_full <= cost_ranges_full
 
     calculated_points = points_sum_full * under_cost_limit
 
-    #KEY LINE: we're finding the max indicies
+    #we're finding the max indicies
     #argmax() returns the index of the max value
     top_inds = calculated_points.argmax(axis=1)
 
@@ -124,8 +125,10 @@ def optimize(combo_positions_dict, df):
     winning_ids = winner[-1]
 
     print(df.iloc[winning_ids])
-    print(sum(df.iloc[winning_ids].pts))
-    print(sum(df.iloc[winning_ids].sal))
+    print("\n")
+    print("Combined player points:", sum(df.iloc[winning_ids].pts))
+    print("Combined player salary:", sum(df.iloc[winning_ids].sal))
+    print("\n")
 
 
 if __name__ == '__main__':
@@ -151,4 +154,7 @@ if __name__ == '__main__':
     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
     ps.print_stats(10)
     print(s.getvalue())
+
+
+
 
