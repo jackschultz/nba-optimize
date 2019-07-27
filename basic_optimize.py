@@ -19,7 +19,7 @@ def calculate_position_combinations(player_combinations, test_salary, num_player
     '''
     #loop through the list of players that are of that posision
     top_points = 0
-    top_cost = 0
+    top_sal = 0
     top_players = [-1] * num_players
     player_index_lists = [list(range(0, len(player_combinations)))] * num_players
     for indicies in index_generator(player_index_lists):
@@ -40,9 +40,9 @@ def calculate_position_combinations(player_combinations, test_salary, num_player
         if points > top_points:
             top_players = [p['pid'] for p in test_players]
             top_points = points
-            top_cost = sum([p['sal'] for p in test_players])
+            top_sal = sum([p['sal'] for p in test_players])
 
-    return [test_salary, top_cost, top_points, top_players]
+    return [test_salary, top_sal, top_points, top_players]
 
 def combine_single_position(players, num_players):
     '''
@@ -51,9 +51,9 @@ def combine_single_position(players, num_players):
     total.
     #array of sets where (max_salary, combined salary, [list of pids], total_points)
     '''
-    cost_ranges = range(3500*num_players, 60000 + 100, 100)
+    sal_ranges = range(3500*num_players, 60000 + 100, 100)
 
-    return [calculate_position_combinations(players, cost, num_players) for cost in cost_ranges]
+    return [calculate_position_combinations(players, sal, num_players) for sal in sal_ranges]
 
 def calculate_max_points(pos1, pos2, test_salary):
     '''
@@ -74,16 +74,16 @@ def calculate_max_points(pos1, pos2, test_salary):
             if points > top_points:
                 top_players = g1[3] + g2[3]
                 top_points = points
-                top_cost = g1[1] + g2[1]
-    return [test_salary, top_cost, top_points, top_players]
+                top_sal = g1[1] + g2[1]
+    return [test_salary, top_sal, top_points, top_players]
 
 def combine_multiple_positions(pos1, pos2):
 
     num_players = len(pos1[0][3]) + len(pos2[0][3]) #counting the number of pids in those arrays
     max_salary = min(60000 + 100, 13000 * num_players) #if we're only testing 3 players, the max salary they can have combined is 13000 * 3
-    cost_ranges = range(3500*num_players, max_salary, 100)
+    sal_ranges = range(3500*num_players, max_salary, 100)
 
-    return [calculate_max_points(pos1, pos2, salary) for salary in cost_ranges]
+    return [calculate_max_points(pos1, pos2, salary) for salary in sal_ranges]
 
 @time_and_slow_calls
 def optimize(pgs, sgs, sfs, pfs, cs):

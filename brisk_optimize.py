@@ -8,23 +8,23 @@ import pandas as pd
 import pdb
 pry = pdb.set_trace
 
-def calculate_position_combination(test_salary, num_players, costs, points, posdf_indicies):
+def calculate_position_combination(test_salary, num_players, sals, points, posdf_indicies):
 
     #splitting the data fram into the necessary fields
     #Note that we're using the combinations of the players so that we don't
     #have a test with the same player.
     inds_comb = np.array(list(itertools.combinations(posdf_indicies, num_players)))
-    cost_comb = np.array(list(itertools.combinations(costs, num_players)))
+    sal_comb = np.array(list(itertools.combinations(sals, num_players)))
     points_comb = np.array(list(itertools.combinations(points, num_players)))
 
-    #creating an array where we add the costs together to get a 1d array
-    cost_sum = cost_comb.sum(axis=1)
+    #creating an array where we add the sals together to get a 1d array
+    sal_sum = sal_comb.sum(axis=1)
 
-    under_cost_limit = cost_sum <= test_salary
+    under_sal_limit = sal_sum <= test_salary
 
     #adding the points of the combinations and making them zero if the salary sum is
     #higher than the test_salary
-    points_sum = points_comb.sum(axis=1) * under_cost_limit
+    points_sum = points_comb.sum(axis=1) * under_sal_limit
 
     #KEY LINE: we're finding the max indicies
     #argmax() returns the index of the max value
@@ -32,24 +32,24 @@ def calculate_position_combination(test_salary, num_players, costs, points, posd
 
     #now that we know the index of the maximum, we return the relevant info
     max_points = points_comb[max_ind].sum()
-    max_cost = cost_comb[max_ind].sum()
+    max_sal = sal_comb[max_ind].sum()
     top_inds = inds_comb[max_ind]
-    return test_salary, top_inds, max_points, max_cost
+    return test_salary, top_inds, max_points, max_sal
 
 def combine_single_position(position, num_players, df):
 
     posdf = df[df.pos == position]
     posdf_indicies = posdf.index.values
     points = posdf['pts'].values
-    costs = posdf['sal'].values
+    sals = posdf['sal'].values
 
-    cost_ranges = range(3500*num_players, 12000*num_players, 100)
-    return [calculate_position_combination(test_salary, num_players, costs, points, posdf_indicies) for test_salary in cost_ranges]
+    sal_ranges = range(3500*num_players, 12000*num_players, 100)
+    return [calculate_position_combination(test_salary, num_players, sals, points, posdf_indicies) for test_salary in sal_ranges]
 
 def calculate_max_points(pos1, pos2, test_salary):
 
-    costs = np.array([cost for _,_,_,cost in pos1])
-    costs2 = np.array([cost for _,_,_,cost in pos2])
+    sals = np.array([sal for _,_,_,sal in pos1])
+    sals2 = np.array([sal for _,_,_,sal in pos2])
 
     points = np.array([point for _,_,point,_ in pos1])
     points2 = np.array([point for _,_,point,_ in pos2])
@@ -58,23 +58,23 @@ def calculate_max_points(pos1, pos2, test_salary):
     ids2 = np.array([ind for _,ind,_,_ in pos2])
 
     #combining the two arrays to create a full testable combinations
-    full_costs = costs[:, np.newaxis] + costs2
+    full_sals = sals[:, np.newaxis] + sals2
     full_points = points[:, np.newaxis] + points2
 
-    valids = full_costs <= test_salary
+    valids = full_sals <= test_salary
     possibilites = full_points * valids
     x, y = np.unravel_index(possibilites.argmax(), possibilites.shape)
 
     max_points = full_points[x,y]
-    max_costs = full_costs[x,y]
+    max_sals = full_sals[x,y]
     max_inds = np.concatenate([ids[x], ids2[y]])
 
-    return test_salary, max_inds, max_points, max_costs
+    return test_salary, max_inds, max_points, max_sals
 
 def combine_multiple_positions(pos1, pos2, num_players):
 
-    cost_ranges = range(3500*num_players, 60000+100, 100)
-    return [calculate_max_points(pos1, pos2, test_salary) for test_salary in cost_ranges]
+    sal_ranges = range(3500*num_players, 60000+100, 100)
+    return [calculate_max_points(pos1, pos2, test_salary) for test_salary in sal_ranges]
 
 def combine_all_positions(tops_array):
 
