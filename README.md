@@ -2,9 +2,11 @@
 
 Code that show how to optimize a Daily Fantasy Sports (DFS) NBA lineup, which is a version of a knapsack problem.
 
+[Assiciated blog post where I talk about the code](https://bigishdata.com/2019/07/28/optimizing-a-daily-fantasy-sports-nba-lineup-knapsack-numpy-and-giannis/).
+
 Three files included, `basic_optimize.py`, `brisk_optimize.py`, and `fast_optimize.py` each show different ways to perform the optimization.
 
-I included a couple csv data files for us to use. I used other code to get the data from nba.com and the info from FanDuel csv files that list the players and their salaries.
+I included csv data files for us to use. I used other code to get the data from nba.com and the info from FanDuel csv files that list the players and their salaries.
 
 I'm assuming you'll have a virtualenv running python3. If so, run the following:
 
@@ -15,3 +17,9 @@ I'm assuming you'll have a virtualenv running python3. If so, run the following:
 ```
 
 where the second argument is the data file to use.
+
+To run the Jupyter notebooks, instead of looking at the files here, run
+```
+$ jupyter notebook
+```
+which opens a new tab in browser where you can click the notebook files and run them yourself.
