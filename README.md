@@ -18,6 +18,8 @@ I'm assuming you'll have a virtualenv running python3. If so, run the following:
 
 where the second argument is the data file to use.
 
+Three files are also included to show examples of how the three solutions were done using Jupyter notebooks: `example_basic_optimize.ipynb`, `example_brisk_optimize.ipynb`, and `example_fast_optimize.ipynb`.
+
 To run the Jupyter notebooks, instead of looking at the files here, run
 ```
 $ jupyter notebook
